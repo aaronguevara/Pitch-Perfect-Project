@@ -8,6 +8,7 @@
 
 import Foundation
 
+//class to store recorded audio obejct and file path URL so we can transfer this vaule between views.
 class RecordedAudio: NSObject {
     var filePathURL: NSURL!
     var title:String!

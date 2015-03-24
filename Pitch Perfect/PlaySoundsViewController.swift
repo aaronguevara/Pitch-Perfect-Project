@@ -16,10 +16,12 @@ class PlaySoundsViewController: UIViewController {
     var receivedAudio:RecordedAudio!
     var audioEngine : AVAudioEngine!
     var audioFile:AVAudioFile!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //This is the code so that the sound in playback is played over the iPhone main speakers
+        //By overriding the degault audio out put
         let session = AVAudioSession.sharedInstance()
         var error: NSError?
         session.setCategory(AVAudioSessionCategoryPlayAndRecord, error: &error)
@@ -29,17 +31,15 @@ class PlaySoundsViewController: UIViewController {
         
         audioEngine = AVAudioEngine()
         audioFile = AVAudioFile(forReading: receivedAudio.filePathURL, error: nil)
-
+        
+        //Enabling rate modification for palying chipmonk and darth vader sound
         audioPlayer = AVAudioPlayer(contentsOfURL: receivedAudio.filePathURL, error: nil)
         audioPlayer.enableRate = true
-        
-        
     }
-
-    @IBAction func playChipmunkAudio(sender: UIButton) {
-   
-    playAudioWithVariablePitch(1000)
     
+    @IBAction func playChipmunkAudio(sender: UIButton) {
+        //Calling function to set variable pitch update
+        playAudioWithVariablePitch(1000)
     }
     
     @IBAction func playDarthvaderAudio(sender: UIButton) {
@@ -48,33 +48,42 @@ class PlaySoundsViewController: UIViewController {
     
     
     func playAudioWithVariablePitch(pitch: Float) {
+        //Stop playing current sound and start play from the beginning.
         audioPlayer.stop()
         audioEngine.stop()
         audioEngine.reset()
+        
+        //attached audio node to engine for play
         var audioPlayerNode = AVAudioPlayerNode()
         audioEngine.attachNode(audioPlayerNode)
         
+        //Update the pitch value for the pitch effect.
         var changePitchEffect = AVAudioUnitTimePitch()
         changePitchEffect.pitch = pitch
         audioEngine.attachNode(changePitchEffect)
         
+        //make the pitch value udpate part of the audioengine object for play
         audioEngine.connect(audioPlayerNode, to: changePitchEffect, format: nil)
         audioEngine.connect(changePitchEffect, to: audioEngine.outputNode, format: nil)
         
         audioPlayerNode.scheduleFile(audioFile, atTime: nil, completionHandler: nil)
         audioEngine.startAndReturnError(nil)
         
+        //play audio.
         audioPlayerNode.play()
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
-
+    
     @IBAction func playSoundFast(sender: UIButton) {
-    playSound(1.5)
+        //Stop playing current sound and start play from the beginning.
+        audioPlayer.stop()
+        audioEngine.stop()
+        audioEngine.reset()
+        playSound(1.5)
     }
     
     
@@ -84,7 +93,7 @@ class PlaySoundsViewController: UIViewController {
     }
     
     func playSound(rateSound: Float) {
-
+        
         audioPlayer.stop()
         audioPlayer.currentTime = 0
         audioPlayer.rate = rateSound
@@ -92,16 +101,11 @@ class PlaySoundsViewController: UIViewController {
     }
     
     @IBAction func playSoundSlow(sender: UIButton) {
+        //Stop playing current sound and start play from the beginning.
+        audioPlayer.stop()
+        audioEngine.stop()
+        audioEngine.reset()
         playSound(0.5)
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
+
